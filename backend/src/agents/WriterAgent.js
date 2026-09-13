@@ -18,11 +18,12 @@ class WriterAgent extends Agent {
         });
     }
 
-    async execute(task) {
+    async execute({ task, context = {} }) {
         return {
             agent: this.name,
             task: task,
-            result: `Writing completed for: ${task}`
+            contextReceived: context,
+            result: `Writing completed using ${Object.keys(context).length} previous results.`
         };
     }
 }

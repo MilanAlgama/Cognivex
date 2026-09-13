@@ -18,7 +18,7 @@ class AnalysisAgent extends Agent {
         });
     }
 
-    async execute(task) {
+    async execute({ task, context = {} }) {
         return {
             agent: this.name,
             task: task,

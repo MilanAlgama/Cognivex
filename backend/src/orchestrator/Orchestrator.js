@@ -2,43 +2,66 @@ const {
     getAgentById
 } = require("../agents/agentRegistry");
 
+const Planner = require("./Planner");
+
 class Orchestrator {
 
-    async execute(task, agentId) {
+    constructor() {
+        this.planner = new Planner();
+    }
 
-        // Find the requested agent
-        const agent = getAgentById(agentId);
+    async execute(task) {
 
-        if (!agent) {
-            throw new Error(`Agent not found: ${agentId}`);
-        }
+        task.updateStatus("planning");
 
-        // Update task status
+        // Create execution plan
+        const plan = this.planner.createPlan(task);
+
+        task.plan = plan;
+
         task.updateStatus("running");
 
-        try {
+        const results = [];
 
-            // Execute the task using the agent
-            const result = await agent.execute(task.description);
+        // Execute each subtask
+        for (const subtask of plan.subtasks) {
 
-            // Store result
-            task.addResult(result);
+            const agent = getAgentById(subtask.agentId);
 
-            // Update task status
-            task.updateStatus("completed");
+            if (!agent) {
+                throw new Error(
+                    `Agent not found: ${subtask.agentId}`
+                );
+            }
 
-            return {
-                success: true,
-                task,
+            subtask.status = "running";
+
+            const result = await agent.execute(
+                subtask.description
+            );
+
+            subtask.status = "completed";
+
+            results.push({
+                subtaskId: subtask.id,
+                agentId: agent.id,
                 result
-            };
-
-        } catch (error) {
-
-            task.updateStatus("failed");
-
-            throw error;
+            });
         }
+
+        // Store results
+        for (const result of results) {
+            task.addResult(result);
+        }
+
+        task.updateStatus("completed");
+
+        return {
+            success: true,
+            task,
+            plan,
+            results
+        };
     }
 }
 

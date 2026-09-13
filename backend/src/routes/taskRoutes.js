@@ -60,8 +60,6 @@ router.get("/:id", (req, res) => {
 // Execute task
 router.post("/:id/execute", async (req, res) => {
 
-    const { agentId } = req.body;
-
     const task = getTaskById(req.params.id);
 
     if (!task) {
@@ -71,23 +69,15 @@ router.post("/:id/execute", async (req, res) => {
         });
     }
 
-    if (!agentId) {
-        return res.status(400).json({
-            success: false,
-            message: "Agent ID is required"
-        });
-    }
-
     try {
 
-        const execution = await orchestrator.execute(
-            task,
-            agentId
-        );
+        const execution = await orchestrator.execute(task);
 
         res.json(execution);
 
     } catch (error) {
+
+        task.updateStatus("failed");
 
         res.status(500).json({
             success: false,

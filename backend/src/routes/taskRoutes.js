@@ -8,6 +8,10 @@ const {
     getTaskById
 } = require("../tasks/taskManager");
 
+const Orchestrator = require("../orchestrator/Orchestrator");
+
+const orchestrator = new Orchestrator();
+
 // Create task
 router.post("/", (req, res) => {
     const { description } = req.body;
@@ -51,6 +55,46 @@ router.get("/:id", (req, res) => {
         success: true,
         task
     });
+});
+
+// Execute task
+router.post("/:id/execute", async (req, res) => {
+
+    const { agentId } = req.body;
+
+    const task = getTaskById(req.params.id);
+
+    if (!task) {
+        return res.status(404).json({
+            success: false,
+            message: "Task not found"
+        });
+    }
+
+    if (!agentId) {
+        return res.status(400).json({
+            success: false,
+            message: "Agent ID is required"
+        });
+    }
+
+    try {
+
+        const execution = await orchestrator.execute(
+            task,
+            agentId
+        );
+
+        res.json(execution);
+
+    } catch (error) {
+
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+
+    }
 });
 
 module.exports = router;

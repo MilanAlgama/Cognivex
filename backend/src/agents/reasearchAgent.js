@@ -1,4 +1,4 @@
-const Agent = require("./agent");
+const Agent = require("./Agent");
 
 class ResearchAgent extends Agent {
     constructor() {

@@ -6,6 +6,7 @@ const agentRoutes = require("./routes/agentRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const llmRoutes = require("./routes/llmRoutes");
 const plannerRoutes = require("./routes/plannerRoutes");
+const validatorRoutes = require("./routes/validatorRoutes");
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use("/api/agents", agentRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/llm", llmRoutes);
 app.use("/api/planner", plannerRoutes);
+app.use("/api/validator", validatorRoutes);
 
 app.listen(PORT, () => {
     console.log(`Cognivex backend running on port ${PORT}`);

@@ -16,7 +16,19 @@ function getAgentById(id) {
     return agents.find((agent) => agent.id === id);
 }
 
+// Returns only the information that the LLM Planner needs
+function getAgentDefinitions() {
+    return agents.map((agent) => ({
+        id: agent.id,
+        name: agent.name,
+        role: agent.role,
+        description: agent.description,
+        capabilities: agent.capabilities
+    }));
+}
+
 module.exports = {
     getAgents,
-    getAgentById
+    getAgentById,
+    getAgentDefinitions
 };
